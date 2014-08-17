@@ -11,6 +11,7 @@
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
 	<!--<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>-->
 	<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.js'></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
 <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
 <style>
 html, body, #map {
@@ -20,6 +21,13 @@ html, body, #map {
 #map {
 	width: 100%;
 }
+
+.leaflet-popup-close-button {
+  display: none;
+  }
+.leaflet-popup-content-wrapper {
+  pointer-events: none;
+  }
 </style>
 </head>
 <body>
@@ -36,7 +44,95 @@ L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
 			id: 'examples.map-20v6611k'
 		}).addTo(map);
 
-var customLayer = L.geoJson(null, {
+/**
+ * map: map object of leaflet, 
+ * url: topojson, 
+ * required: leaflet and leaflet-omnivore, 
+ */
+var Layers = function(map) {
+	this.map = map;
+};
+Layers.prototype.addLayer = function(url, customLayerOptions){
+	if(!customLayerOptions) customLayerOptions = {};
+	if(!customLayerOptions.style) {
+		customLayerOptions.style = function(f){
+			return {
+				weight: 2,
+				opacity: 0.2,
+				color: 'black',
+				fillOpacity: 0.8,
+				fillColor: getColor(f.properties),
+				lineCap: 'round',
+				lineJoin: 'round',
+				className: 'prefLayer'
+			};
+		};
+	}
+	var customLayer = L.geoJson(null, customLayerOptions);
+	omnivore.topojson('./gis/test.topojson', null, customLayer).addTo(map);
+
+	this.showPopup();
+
+	function getColor(f) {
+		console.dir(f);
+		return 'rgb(112, 236, 20)';
+	}
+	function showLegend() {
+		var colors = d3.scale.quantize().domain(domain_arr).range(['255, 255, 255','45, 140, 4']);
+	}
+};
+Layers.prototype.onEachFeature = function(feature, layer) {
+	var that = this;
+	layer.on({
+		mousemove: function(){
+			return mousemove.apply(that, arguments)
+		},
+		mouseout: function(){
+			return mouseout.apply(that, arguments)
+		},
+		click: zoomToFeature
+	});
+};
+Layers.prototype.showPopup = function(f){
+	console.dir(f);
+	this.popup = new L.Popup({ autoPan: false });
+};
+
+var iraqLayers = new Layers(map);
+iraqLayers.addLayer('./gis/test.topojson', {
+	style: function(f){
+		return {
+			weight: 2,
+			opacity: 0.2,
+			color: 'black',
+			fillOpacity: 0.8,
+			fillColor: getColor(f.properties),
+			lineCap: 'round',
+			lineJoin: 'round',
+			className: 'prefLayer'
+		};
+	},
+	onEachFeature: function(){
+		return iraqLayers.onEachFeature.apply(iraqLayers, arguments)
+	}
+});
+function onEachFeature(feature, layer) {
+	//layer
+	layer.on({
+		mousemove: function(){
+			return mousemove.apply(this, arguments)
+		},
+		mouseout: mouseout,
+		click: zoomToFeature
+	});
+}
+function zoomToFeature(e) {
+
+	c.map.fitBounds(layers[0].getBounds());
+
+}
+
+/*var customLayer = L.geoJson(null, {
 	style: function(feature){
 		return {
 			weight: 2,
@@ -50,12 +146,69 @@ var customLayer = L.geoJson(null, {
 		}
 	},
 });
-omnivore.topojson('./gis/test.topojson', null, customLayer).addTo(map);
+omnivore.topojson('./gis/test.topojson', null, customLayer).addTo(map);*/
 
 function getColor(f) {
-	console.dir(f);
+	//console.dir(f);
+	return 'rgb(112, 236, 20)';
 }
 
+function mousemove(e, f, g, h) {
+	var layer = e.target;
+	var props = layer.feature.properties;
+	//var city_code = layer.feature.properties.id;
+
+	var special_area;
+	//var lid = c.statesLayer.getLayerId(layer);
+
+	var title = layer.feature.properties.N03_002 || special_area;
+	//var here = _.filter(c.data, {city_id: city_code})[0];
+	var str = '';
+	str += 'ADM2NAME: '+props.ADM2NAME + '人';
+	str += 'ADM3NAME: '+props.ADM3NAME + '人';
+	str += 'shia_pop: '+props.shia_pop + '人';
+	str += 'sunni_pop: '+props.sunni_pop + '人';
+	str += 'kurd_pop: '+props.kurd_pop + '人';
+	str += 'total_pop: '+props.total_pop + '人';
+
+	//str += '<br>' + $('#menu > select > option[value="'+c.data_prop+'"]').text() + '：' + here[c.data_prop];
+	title = props.ADM2NAME + ' ' + props.ADM3NAME;
+
+	this.popup.setLatLng(e.latlng);
+	this.popup.setContent('<div class="marker-title">' + title + '</div>' 
+		//+ 'id: ' + layer.feature.properties.id + '<br>'
+		+ str
+		//+ (memo?'<hr class="popup_hr">'+memo+'<br>':'')
+		);
+
+	if (!this.popup._map) this.popup.openOn(this.map);
+	window.clearTimeout(closeTooltip);
+
+	// highlight feature
+	layer.setStyle({
+		weight: 3,
+		opacity: 0.3,
+		fillOpacity: 0.9
+	});
+
+	  if (!L.Browser.ie && !L.Browser.opera) {
+	    layer.bringToFront();
+	}
+}
+var closeTooltip;
+function mouseout(e) {
+	var that = this;
+	var layer = e.target;
+	//this.statesLayer.resetStyle(layer);
+	//var lid = c.statesLayer.getLayerId(layer);
+
+	//選択中だったら
+	//if(c.selected_layer_id_arr.indexOf(lid) > -1) layer.setStyle(c.selected_options);
+
+	closeTooltip = window.setTimeout(function() {
+		that.map.closePopup();
+	}, 100);
+}
 </script>
 </body>
 </html>
