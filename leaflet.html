@@ -67,7 +67,7 @@ Layers.prototype.addLayer = function(url, customLayerOptions){
 		};
 	}
 	var customLayer = L.geoJson(null, customLayerOptions);
-	this.Layer = omnivore.topojson('./gis/test.topojson', null, customLayer).addTo(this.map);
+	this.Layer = omnivore.topojson(url, null, customLayer).addTo(this.map);
 
 	this.showPopup();
 
@@ -175,7 +175,7 @@ L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
 
 
 var iraqLayers = new Layers(map);
-iraqLayers.addLayer('./gis/test.topojson');
+iraqLayers.addLayer('./gis/iraq.topojson');
 iraqLayers.data_labels = [
 	{prop: 'ADM2NAME', label: 'ADM2NAME', unit: ''},
 	{prop: 'ADM3NAME', label: 'ADM3NAME', unit: ''},
