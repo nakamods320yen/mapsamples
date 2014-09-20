@@ -36,17 +36,6 @@ html, body, #map {
 <body>
 	<div id="map"></div>
 <script>
-// create a map in the "map" div, set the view to a given place and zoom
-var map = L.map('map').setView([33, 44], 7);
-
-L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
-			maxZoom: 18,
-			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-				'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-			id: 'examples.map-20v6611k'
-		}).addTo(map);
-
 /**
  * map: map object of leaflet, 
  * url: topojson, 
@@ -78,7 +67,7 @@ Layers.prototype.addLayer = function(url, customLayerOptions){
 		};
 	}
 	var customLayer = L.geoJson(null, customLayerOptions);
-	this.Layer = omnivore.topojson('./gis/test.topojson', null, customLayer).addTo(map);
+	this.Layer = omnivore.topojson('./gis/test.topojson', null, customLayer).addTo(this.map);
 
 	this.showPopup();
 
@@ -169,6 +158,20 @@ Layers.prototype.zoomToFeature = function(e){
 Layers.prototype.getColor = function(e){
 	return 'rgb(112, 236, 20)';
 };
+
+
+
+
+// create a map in the "map" div, set the view to a given place and zoom
+var map = L.map('map').setView([33, 44], 7);
+
+L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
+			maxZoom: 18,
+			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+				'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+			id: 'examples.map-20v6611k'
+		}).addTo(map);
 
 
 var iraqLayers = new Layers(map);
