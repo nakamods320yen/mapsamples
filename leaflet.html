@@ -107,13 +107,13 @@ Layers.prototype.mousemove = function(e){
 
 	var title = layer.feature.properties.N03_002 || special_area;
 	//var here = _.filter(c.data, {city_id: city_code})[0];
-	var str = '';
-	str += 'ADM2NAME: '+props.ADM2NAME + '人';
-	str += 'ADM3NAME: '+props.ADM3NAME + '人';
-	str += 'shia_pop: '+props.shia_pop + '人';
-	str += 'sunni_pop: '+props.sunni_pop + '人';
-	str += 'kurd_pop: '+props.kurd_pop + '人';
-	str += 'total_pop: '+props.total_pop + '人';
+	var str = '',showing_data_arr = [];
+	var data_labels = this.data_labels;
+	for(var i=-1,l=data_labels.length,line={};++i<l;) {
+		line = data_labels[i];
+		showing_data_arr.push(line.label + ': ' + props[line.prop] + (line.unit?line.unit:''));
+	}
+	str = showing_data_arr.join('<br>');
 
 	//str += '<br>' + $('#menu > select > option[value="'+c.data_prop+'"]').text() + '：' + here[c.data_prop];
 	title = props.ADM2NAME + ' ' + props.ADM3NAME;
@@ -176,6 +176,14 @@ L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
 
 var iraqLayers = new Layers(map);
 iraqLayers.addLayer('./gis/test.topojson');
+iraqLayers.data_labels = [
+	{prop: 'ADM2NAME', label: 'ADM2NAME', unit: ''},
+	{prop: 'ADM3NAME', label: 'ADM3NAME', unit: ''},
+	{prop: 'shia_pop', label: 'shia_pop', unit: '人'},
+	{prop: 'sunni_pop',label: 'sunni_pop', unit: '人'},
+	{prop: 'kurd_pop', label: 'kurd_pop', unit: '人'},
+	{prop: 'total_pop',label: 'total_pop', unit: '人'},
+];
 
 </script>
 </body>
