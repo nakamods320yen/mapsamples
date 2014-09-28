@@ -2,18 +2,15 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>leaflet</title>
-	<!--<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
-	<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
-<link rel="stylesheet" href="http://leafletjs.com/dist/leaflet.css" />-->
-	<!--<script src='//leafletjs.com/dist/leaflet.js'></script>
-	<script src='//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.1.2/leaflet-omnivore.min.js'></script>-->
-	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+	<title>mapbox</title>
+	<!-- <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" /> -->
+	<script src='https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.js'></script>
 	<!--<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>-->
 	<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.js'></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
-<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
 	<script src="./js/leaflet-choropleth.js"></script>
+<!-- <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script> -->
+<link href='https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.css' rel='stylesheet' />
 <style>
 html, body, #map {
 	height: 100%;
@@ -29,19 +26,22 @@ html, body, #map {
 .leaflet-popup-content-wrapper {
 	pointer-events: none;
 }
-.leaflet-popup {
+/*.leaflet-popup {
 	margin-bottom: 7px;
-}
+}*/
 </style>
 </head>
 <body>
+	
 	<div id="map"></div>
 <script>
 
 
 
+
+
 // create a map in the "map" div, set the view to a given place and zoom
-var map = L.map('map').setView([33, 44], 7);
+var map = L.mapbox.map('map').setView([33, 44], 7);
 
 L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
 			maxZoom: 18,
