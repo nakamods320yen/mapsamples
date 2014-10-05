@@ -29,6 +29,21 @@ html, body, #map {
 /*.leaflet-popup {
 	margin-bottom: 7px;
 }*/
+
+.map-legend > ul {
+  padding: 0;
+}
+.map-legend .swatch {
+  width:20px;
+  height:20px;
+  float:left;
+  margin-right:10px;
+  }
+.legend_memo {
+	width: 130px;
+	line-height: 1.4em;
+	margin-top: 10px;
+}
 </style>
 </head>
 <body>
@@ -62,33 +77,32 @@ iraqLayers.getColorNo = function(data){
 	if(data.prop_kurd > 0 && data.prop_sunni > 0) return 3;
 	if(data.prop_shia > 0 && data.prop_sunni > 0) return 4;
 };
+iraqLayers.color_arr = [
+	{label: 'Shia', color: '112, 236, 20'}, //green
+	{label: 'Sunni', color: '112, 20, 236'}, //purple
+	{label: 'Kurd', color: '236, 112, 20'}, //orange
+	{label: 'Sunni&Kurd', color: '174, 66, 128'}, 
+	{label: 'Sunni&Shia', color: '112, 174, 174'}, 
+	/*{label: 'Sunni', color: 'rgb(20, 112, 236)'}, //blue
+	{label: 'Sunni', color: 'rgb(20, 236, 112)'}, //bluegreen
+	{label: 'Sunni', color: 'rgb(236, 20, 112)'} //pink*/
+];
 iraqLayers.getColor = function(data){
-	console.dir(data);
-	this.color_arr = [
-		'rgb(112, 236, 20)', //green
-		'rgb(112, 20, 236)', //purple
-		'rgb(236, 112, 20)', //orange
-		'rgb(174, 66, 128)', 
-		'rgb(112, 174, 174)', 
-		'rgb(20, 112, 236)', //blue
-		'rgb(20, 236, 112)', //bluegreen
-		'rgb(236, 20, 112)' //pink
-	];
-
 	var color_no = this.getColorNo(data);
-
-	return this.color_arr[color_no];
+	return 'rgba('+this.color_arr[color_no].color+', .7)';
 };
-iraqLayers.setLegend = function(e){
-	var color_arr = [
-		'rgb(112, 236, 20)', //green
-		'rgb(112, 20, 236)', //purple
-		'rgb(20, 112, 236)', //blue
-		'rgb(20, 236, 112)', //bluegreen
-		'rgb(236, 112, 20)', //orange
-		'rgb(236, 20, 112)' //pink
-	];
-	return color_arr[5];
+iraqLayers.setLegend = function(){
+	var labels = [], label = '';
+	var label_unit = '', legend_memo = '';
+	for(var i=-1,l=this.color_arr.length;++i<l;) {
+		labels.push(
+			'<li><span id="legend_color_'+i+'" class="swatch" style="background:rgba(' + this.color_arr[i].color + ', 0.7)"></span> '
+			+ '<span id="legend_label_'+i+'">'+this.color_arr[i].label+'</span>') + '</li>\n';
+	}
+	var legend_HTML = '<span>凡例'+(label_unit?' ('+label_unit+')':'')+'</span><ul style="list-style-type: none;">' + labels.join('') + legend_memo+'</ul>';
+	this.map.legendControl.removeLegend(this.legend_HTML);
+	this.legend_HTML = legend_HTML;
+	this.legend = this.map.legendControl.addLegend(legend_HTML);
 };
 
 
@@ -101,6 +115,7 @@ iraqLayers.data_labels = [
 	{prop: 'kurd_pop', label: 'kurd_pop', unit: '人'},
 	{prop: 'total_pop',label: 'total_pop', unit: '人'},
 ];
+iraqLayers.setLegend();
 
 </script>
 </body>
