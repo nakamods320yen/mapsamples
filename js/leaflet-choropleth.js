@@ -67,8 +67,6 @@ Layers.prototype.mousemove = function(e){
 	var special_area;
 	//var lid = c.statesLayer.getLayerId(layer);
 
-	var title = layer.feature.properties.N03_002 || special_area;
-	//var here = _.filter(c.data, {city_id: city_code})[0];
 	var str = '',showing_data_arr = [];
 	var data_labels = this.data_labels;
 	for(var i=-1,l=data_labels.length,line={};++i<l;) {

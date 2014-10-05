@@ -53,10 +53,49 @@ L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
 
 
 var iraqLayers = new Layers(map);
+
+//decide number of color
+iraqLayers.getColorNo = function(data){
+	if(data.prop_shia === 1) return 0;
+	if(data.prop_sunni === 1) return 1;
+	if(data.prop_kurd === 1) return 2;
+	if(data.prop_kurd > 0 && data.prop_sunni > 0) return 3;
+	if(data.prop_shia > 0 && data.prop_sunni > 0) return 4;
+};
+iraqLayers.getColor = function(data){
+	console.dir(data);
+	this.color_arr = [
+		'rgb(112, 236, 20)', //green
+		'rgb(112, 20, 236)', //purple
+		'rgb(236, 112, 20)', //orange
+		'rgb(174, 66, 128)', 
+		'rgb(112, 174, 174)', 
+		'rgb(20, 112, 236)', //blue
+		'rgb(20, 236, 112)', //bluegreen
+		'rgb(236, 20, 112)' //pink
+	];
+
+	var color_no = this.getColorNo(data);
+
+	return this.color_arr[color_no];
+};
+iraqLayers.setLegend = function(e){
+	var color_arr = [
+		'rgb(112, 236, 20)', //green
+		'rgb(112, 20, 236)', //purple
+		'rgb(20, 112, 236)', //blue
+		'rgb(20, 236, 112)', //bluegreen
+		'rgb(236, 112, 20)', //orange
+		'rgb(236, 20, 112)' //pink
+	];
+	return color_arr[5];
+};
+
+
 iraqLayers.addLayer('./gis/iraq.topojson');
 iraqLayers.data_labels = [
-	{prop: 'ADM2NAME', label: 'ADM2NAME', unit: ''},
-	{prop: 'ADM3NAME', label: 'ADM3NAME', unit: ''},
+	/*{prop: 'ADM2NAME', label: 'ADM2NAME', unit: ''},
+	{prop: 'ADM3NAME', label: 'ADM3NAME', unit: ''},*/
 	{prop: 'shia_pop', label: 'shia_pop', unit: '人'},
 	{prop: 'sunni_pop',label: 'sunni_pop', unit: '人'},
 	{prop: 'kurd_pop', label: 'kurd_pop', unit: '人'},
