@@ -67,23 +67,32 @@ Layers.prototype.mousemove = function(e){
 	var special_area;
 	//var lid = c.statesLayer.getLayerId(layer);
 
-	var str = '',showing_data_arr = [];
-	var data_labels = this.data_labels;
-	for(var i=-1,l=data_labels.length,line={};++i<l;) {
-		line = data_labels[i];
-		showing_data_arr.push(line.label + ': ' + props[line.prop] + (line.unit?line.unit:''));
-	}
-	str = showing_data_arr.join('<br>');
 
-	//str += '<br>' + $('#menu > select > option[value="'+c.data_prop+'"]').text() + '：' + here[c.data_prop];
-	title = props.ADM2NAME + ' ' + props.ADM3NAME;
+	var html = '';
+	//setBaloonHTML
+	if(typeof this.setBaloonHTML == 'function') {
+		html = this.setBaloonHTML(props);
+	} else {
+		var str = '',showing_data_arr = [];
+		var data_labels = this.data_labels;
+		for(var i=-1,l=data_labels.length,line={};++i<l;) {
+			line = data_labels[i];
+			showing_data_arr.push(line.label + ': ' + props[line.prop] + (line.unit?line.unit:''));
+		}
+		str = showing_data_arr.join('<br>');
+
+		//str += '<br>' + $('#menu > select > option[value="'+c.data_prop+'"]').text() + '：' + here[c.data_prop];
+		title = props.ADM2NAME + ' ' + props.ADM3NAME;
+
+		html = '<div class="marker-title">' + title + '</div>' 
+			//+ 'id: ' + layer.feature.properties.id + '<br>'
+			+ str
+			//+ (memo?'<hr class="popup_hr">'+memo+'<br>':'')
+			;
+	}
 
 	this.popup.setLatLng(e.latlng);
-	this.popup.setContent('<div class="marker-title">' + title + '</div>' 
-		//+ 'id: ' + layer.feature.properties.id + '<br>'
-		+ str
-		//+ (memo?'<hr class="popup_hr">'+memo+'<br>':'')
-		);
+	this.popup.setContent(html);
 
 	if (!this.popup._map) this.popup.openOn(this.map);
 	window.clearTimeout(this.closeTooltip);
@@ -113,7 +122,8 @@ Layers.prototype.mouseout = function(e){
 	}, 100);
 };
 Layers.prototype.zoomToFeature = function(e){
-	c.map.fitBounds(layers[0].getBounds());
+	var layer = e.target;
+	this.map.fitBounds(layer.getBounds());
 };
 Layers.prototype.getColor = function(e){
 	return 'rgb(112, 236, 20)';

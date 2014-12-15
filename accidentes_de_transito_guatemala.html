@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>accidentes de transito guatemala</title>
+	<!-- <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" /> -->
+	<script src='https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.js'></script>
+	<!--<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>-->
+	<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.js'></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
+	<script src="./js/leaflet-choropleth.js"></script>
+<!-- <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script> -->
+<link href='https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.css' rel='stylesheet' />
+<style>
+html, body, #map {
+	height: 100%;
+	margin: 0;
+}
+#map {
+	width: 100%;
+}
+
+.leaflet-popup-close-button {
+	display: none;
+}
+.leaflet-popup-content-wrapper {
+	pointer-events: none;
+}
+/*.leaflet-popup {
+	margin-bottom: 7px;
+}*/
+
+.map-legend > ul {
+  padding: 0;
+}
+.map-legend .swatch {
+  width:20px;
+  height:20px;
+  float:left;
+  margin-right:10px;
+  }
+.legend_memo {
+	width: 130px;
+	line-height: 1.4em;
+	margin-top: 10px;
+}
+</style>
+</head>
+<body>
+	
+	<div id="map"></div>
+<script>
+
+
+
+
+
+// create a map in the "map" div, set the view to a given place and zoom
+var map = L.mapbox.map('map').setView([15.783471,-90.230759], 7);
+
+L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
+			maxZoom: 18,
+			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+				'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+			id: 'examples.map-20v6611k'
+		}).addTo(map);
+
+
+var gtLayer = new Layers(map);
+
+//decide number of color
+gtLayer.getColorNo = function(data){
+	var obj = tsvdata.filter(function(d){return d.Departamento==data.name})[0];
+	if(!obj)return 4;
+	var pop2013 = obj['2013'];
+	if(pop2013 > 160) return 0;
+	if(pop2013 > 130) return 1;
+	if(pop2013 > 100) return 2;
+	if(pop2013 > 70)  return 3;
+	return 4;
+};
+gtLayer.color_arr = [
+	{label: '160 -', color: '224, 53, 98'}, //green
+	{label: '130 - 160', color: '255, 131, 96'}, //purple
+	{label: '100 - 130', color: '255, 241, 102'}, //orange
+	{label: '70 - 100', color: '80, 255, 177'}, 
+	{label: '- 70', color: '0, 255, 245'}, 
+	/*{label: 'Sunni', color: 'rgb(20, 112, 236)'}, //blue
+	{label: 'Sunni', color: 'rgb(20, 236, 112)'}, //bluegreen
+	{label: 'Sunni', color: 'rgb(236, 20, 112)'} //pink*/
+];
+gtLayer.getColor = function(data){
+	var color_no = this.getColorNo(data);
+	return 'rgba('+this.color_arr[color_no].color+', .7)';
+};
+gtLayer.setLegend = function(){
+	var labels = [], label = '';
+	var label_unit = '', legend_memo = '';
+	for(var i=-1,l=this.color_arr.length;++i<l;) {
+		labels.push(
+			'<li><span id="legend_color_'+i+'" class="swatch" style="background:rgba(' + this.color_arr[i].color + ', 0.7)"></span> '
+			+ '<span id="legend_label_'+i+'">'+this.color_arr[i].label+'</span>') + '</li>\n';
+	}
+	var legend_HTML = '<span>凡例'+(label_unit?' ('+label_unit+')':'')+'</span><ul style="list-style-type: none;">' + labels.join('') + legend_memo+'</ul>';
+	this.map.legendControl.removeLegend(this.legend_HTML);
+	this.legend_HTML = legend_HTML;
+	this.legend = this.map.legendControl.addLegend(legend_HTML);
+};
+
+var tsvdata;
+year = '2013';
+d3.tsv('./data/accidentes_de_transito_guatemala.tsv', function(tsv){
+	tsv.forEach(function(d){
+		d['2013'] = +d['2013'];
+	});
+	tsvdata = tsv;
+	gtLayer.addLayer('./gis/gt.topojson');
+	gtLayer.setLegend();
+});
+gtLayer.setBaloonHTML = function(props){
+	var name = props.name;
+	var obj = tsvdata.filter(function(d){return d.Departamento==name})[0];
+	var html = '<div class="marker-title">' + props.name + '</div>'
+		+ (!!obj?obj['2013']+'人':'');
+	return html;
+};
+
+</script>
+</body>
+</html>
