@@ -9,7 +9,11 @@
 	<!--<script src='//leafletjs.com/dist/leaflet.js'></script>
 	<script src='//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.1.2/leaflet-omnivore.min.js'></script>-->
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+	<!--<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>-->
+	<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.js'></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js"></script>
 <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+	<script src="./js/leaflet-choropleth.js"></script>
 <style>
 html, body, #map {
 	height: 100%;
@@ -18,13 +22,26 @@ html, body, #map {
 #map {
 	width: 100%;
 }
+
+.leaflet-popup-close-button {
+	display: none;
+}
+.leaflet-popup-content-wrapper {
+	pointer-events: none;
+}
+.leaflet-popup {
+	margin-bottom: 7px;
+}
 </style>
 </head>
 <body>
 	<div id="map"></div>
 <script>
+
+
+
 // create a map in the "map" div, set the view to a given place and zoom
-var map = L.map('map').setView([51.505, -0.09], 13);
+var map = L.map('map').setView([33, 44], 7);
 
 L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
 			maxZoom: 18,
@@ -33,6 +50,19 @@ L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
 				'Imagery © <a href="http://mapbox.com">Mapbox</a>',
 			id: 'examples.map-20v6611k'
 		}).addTo(map);
+
+
+var iraqLayers = new Layers(map);
+iraqLayers.addLayer('./gis/iraq.topojson');
+iraqLayers.data_labels = [
+	{prop: 'ADM2NAME', label: 'ADM2NAME', unit: ''},
+	{prop: 'ADM3NAME', label: 'ADM3NAME', unit: ''},
+	{prop: 'shia_pop', label: 'shia_pop', unit: '人'},
+	{prop: 'sunni_pop',label: 'sunni_pop', unit: '人'},
+	{prop: 'kurd_pop', label: 'kurd_pop', unit: '人'},
+	{prop: 'total_pop',label: 'total_pop', unit: '人'},
+];
+
 </script>
 </body>
 </html>
